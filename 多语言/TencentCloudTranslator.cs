@@ -78,7 +78,7 @@ public class TencentCloudTranslator
         if (string.IsNullOrEmpty(secretId) || secretId == "YOUR_SECRET_ID" ||
             string.IsNullOrEmpty(secretKey) || secretKey == "YOUR_SECRET_KEY")
         {
-            Debug.LogError("ÌÚÑ¶ÔÆÆ¾Ö¤Î´ÉèÖÃ");
+            Debug.LogError("è…¾è®¯äº‘å‡­è¯æœªè®¾ç½®");
             return text;
         }
 
@@ -99,16 +99,16 @@ public class TencentCloudTranslator
                 string endpoint = GetEndpoint();
                 string requestPayload = JsonUtility.ToJson(requestData);
 
-                // Ê¹ÓÃµ±Ç°Ê±¼ä
+                // ä½¿ç”¨å½“å‰æ—¶é—´
                 DateTime requestDate = DateTime.UtcNow;
 
-                // Ê¹ÓÃ¹Ù·½Ê¾ÀıµÄÇ©Ãû·½·¨
+                // ä½¿ç”¨å®˜æ–¹ç¤ºä¾‹çš„ç­¾åæ–¹æ³•
                 var headers = BuildHeaders(secretId, secretKey, service, endpoint, region, action, version, requestDate, requestPayload);
 
                 string url = $"https://{endpoint}";
                 var request = new HttpRequestMessage(HttpMethod.Post, url);
 
-                // Ìí¼ÓËùÓĞÍ·²¿
+                // æ·»åŠ æ‰€æœ‰å¤´éƒ¨
                 foreach (var header in headers)
                 {
                     if (header.Key == "Host")
@@ -117,7 +117,7 @@ public class TencentCloudTranslator
                     }
                     else if (header.Key == "Content-Type")
                     {
-                        // Content-Type »áÔÚ StringContent ÖĞÉèÖÃ£¬ÕâÀïÌø¹ı
+                        // Content-Type ä¼šåœ¨ StringContent ä¸­è®¾ç½®ï¼Œè¿™é‡Œè·³è¿‡
                         continue;
                     }
                     else
@@ -126,18 +126,18 @@ public class TencentCloudTranslator
                     }
                 }
 
-                // ´´½¨ÄÚÈİ
+                // åˆ›å»ºå†…å®¹
                 var content = new StringContent(requestPayload, Encoding.UTF8, "application/json");
                 request.Content = content;
 
-                Debug.Log($"ÇëÇóURL: {url}");
-                Debug.Log($"ÇëÇó¸ºÔØ: {requestPayload}");
+                Debug.Log($"è¯·æ±‚URL: {url}");
+                Debug.Log($"è¯·æ±‚è´Ÿè½½: {requestPayload}");
 
                 var response = await client.SendAsync(request);
                 var responseString = await response.Content.ReadAsStringAsync();
 
-                Debug.Log($"ÏìÓ¦×´Ì¬: {response.StatusCode}");
-                Debug.Log($"ÏìÓ¦ÄÚÈİ: {responseString}");
+                Debug.Log($"å“åº”çŠ¶æ€: {response.StatusCode}");
+                Debug.Log($"å“åº”å†…å®¹: {responseString}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -145,46 +145,46 @@ public class TencentCloudTranslator
                     if (result?.Response != null)
                     {
                         string translatedText = result.Response.TargetText;
-                        Debug.Log($"·­Òë³É¹¦: '{text}' -> '{translatedText}'");
+                        Debug.Log($"ç¿»è¯‘æˆåŠŸ: '{text}' -> '{translatedText}'");
                         return CleanTranslationResult(translatedText);
                     }
                     else if (result?.Error != null)
                     {
-                        Debug.LogError($"API·µ»Ø´íÎó: {result.Error.Code} - {result.Error.Message}");
+                        Debug.LogError($"APIè¿”å›é”™è¯¯: {result.Error.Code} - {result.Error.Message}");
                         return text;
                     }
                 }
 
-                Debug.LogError($"HTTP´íÎó: {response.StatusCode}");
+                Debug.LogError($"HTTPé”™è¯¯: {response.StatusCode}");
                 return text;
             }
         }
         catch (Exception e)
         {
-            Debug.LogError($"ÌÚÑ¶ÔÆ·­ÒëÊ§°Ü: {e.Message}");
-            Debug.LogError($"ÍêÕûÒì³£: {e}");
+            Debug.LogError($"è…¾è®¯äº‘ç¿»è¯‘å¤±è´¥: {e.Message}");
+            Debug.LogError($"å®Œæ•´å¼‚å¸¸: {e}");
             return text;
         }
     }
 
-    // »ùÓÚ¹Ù·½Ê¾ÀıµÄÇ©Ãû·½·¨
+    // åŸºäºå®˜æ–¹ç¤ºä¾‹çš„ç­¾åæ–¹æ³•
     private Dictionary<string, string> BuildHeaders(string secretId, string secretKey, string service,
         string endpoint, string region, string action, string version, DateTime date, string requestPayload)
     {
         string datestr = date.ToString("yyyy-MM-dd");
 
-        // ĞŞÕıÊ±¼ä´Á¼ÆËã - Ê¹ÓÃÃë¼¶Ê±¼ä´Á
+        // ä¿®æ­£æ—¶é—´æˆ³è®¡ç®— - ä½¿ç”¨ç§’çº§æ—¶é—´æˆ³
         DateTime startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         long requestTimestamp = (long)(date - startTime).TotalSeconds;
 
-        // ************* ²½Öè 1£ºÆ´½Ó¹æ·¶ÇëÇó´® *************
+        // ************* æ­¥éª¤ 1ï¼šæ‹¼æ¥è§„èŒƒè¯·æ±‚ä¸² *************
         string algorithm = "TC3-HMAC-SHA256";
         string httpRequestMethod = "POST";
         string canonicalUri = "/";
         string canonicalQueryString = "";
         string contentType = "application/json; charset=utf-8";
 
-        // ĞŞÕı¹æ·¶Í·¸ñÊ½ - ×¢Òâ½áÎ²µÄ \n
+        // ä¿®æ­£è§„èŒƒå¤´æ ¼å¼ - æ³¨æ„ç»“å°¾çš„ \n
         string canonicalHeaders = "content-type:" + contentType + "\n"
             + "host:" + endpoint + "\n";
 
@@ -198,11 +198,11 @@ public class TencentCloudTranslator
             + signedHeaders + "\n"
             + hashedRequestPayload;
 
-        Debug.Log("=== ¹æ·¶ÇëÇó ===");
+        Debug.Log("=== è§„èŒƒè¯·æ±‚ ===");
         Debug.Log(canonicalRequest);
         Debug.Log("================");
 
-        // ************* ²½Öè 2£ºÆ´½Ó´ıÇ©Ãû×Ö·û´® *************
+        // ************* æ­¥éª¤ 2ï¼šæ‹¼æ¥å¾…ç­¾åå­—ç¬¦ä¸² *************
         string credentialScope = datestr + "/" + service + "/" + "tc3_request";
         string hashedCanonicalRequest = SHA256Hex(canonicalRequest);
         string stringToSign = algorithm + "\n"
@@ -210,11 +210,11 @@ public class TencentCloudTranslator
             + credentialScope + "\n"
             + hashedCanonicalRequest;
 
-        Debug.Log("=== ´ıÇ©Ãû×Ö·û´® ===");
+        Debug.Log("=== å¾…ç­¾åå­—ç¬¦ä¸² ===");
         Debug.Log(stringToSign);
         Debug.Log("===================");
 
-        // ************* ²½Öè 3£º¼ÆËãÇ©Ãû *************
+        // ************* æ­¥éª¤ 3ï¼šè®¡ç®—ç­¾å *************
         byte[] tc3SecretKey = Encoding.UTF8.GetBytes("TC3" + secretKey);
         byte[] secretDate = HmacSHA256(tc3SecretKey, Encoding.UTF8.GetBytes(datestr));
         byte[] secretService = HmacSHA256(secretDate, Encoding.UTF8.GetBytes(service));
@@ -222,9 +222,9 @@ public class TencentCloudTranslator
         byte[] signatureBytes = HmacSHA256(secretSigning, Encoding.UTF8.GetBytes(stringToSign));
         string signature = BitConverter.ToString(signatureBytes).Replace("-", "").ToLower();
 
-        //  Debug.Log($"Ç©Ãû: {signature}");
+        //  Debug.Log($"ç­¾å: {signature}");
 
-        // ************* ²½Öè 4£ºÆ´½Ó Authorization *************
+        // ************* æ­¥éª¤ 4ï¼šæ‹¼æ¥ Authorization *************
         string authorization = algorithm + " "
             + "Credential=" + secretId + "/" + credentialScope + ", "
             + "SignedHeaders=" + signedHeaders + ", "
@@ -232,7 +232,7 @@ public class TencentCloudTranslator
 
         Debug.Log($"Authorization: {authorization}");
 
-        // ¹¹½¨Í·²¿
+        // æ„å»ºå¤´éƒ¨
         Dictionary<string, string> headers = new Dictionary<string, string>();
         headers.Add("Authorization", authorization);
         headers.Add("Host", endpoint);
@@ -242,7 +242,7 @@ public class TencentCloudTranslator
         headers.Add("X-TC-Action", action);
         headers.Add("X-TC-Region", region);
 
-        Debug.Log("=== ×îÖÕÇëÇóÍ· ===");
+        Debug.Log("=== æœ€ç»ˆè¯·æ±‚å¤´ ===");
         foreach (var header in headers)
         {
             Debug.Log($"{header.Key}: {header.Value}");
